@@ -217,12 +217,11 @@ function makeVariantsForRow(row) {
   const grayCell = cells[4];
 
   const origSvg = origCell.querySelector('svg');
-  if (!origSvg) return; // nothing to do
+  if (!origSvg) return; 
 
-  // Ensure viewBox is present
+  
   let vb = origSvg.getAttribute('viewBox');
   if (!vb) {
-    // If there is no viewBox, try to synthesize from width/height
     const w = parseFloat(origSvg.getAttribute('width')) || 1000;
     const h = parseFloat(origSvg.getAttribute('height')) || 1000;
     vb = `0 0 ${w} ${h}`;
@@ -231,7 +230,6 @@ function makeVariantsForRow(row) {
   const cx = minX + vbW / 2;
   const cy = minY + vbH / 2;
 
-  // Helper to create an empty SVG with same viewBox
   function makeEmptySVG() {
     const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     s.setAttribute('viewBox', `${minX} ${minY} ${vbW} ${vbH}`);
@@ -240,17 +238,14 @@ function makeVariantsForRow(row) {
     return s;
   }
 
-  // Clone contents of original into a <g>
   function cloneContentGroup() {
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    // clone all children (deep)
     origSvg.childNodes.forEach(node => {
       g.appendChild(node.cloneNode(true));
     });
     return g;
   }
 
-  // 1) Mirror LR: translate(vbW,0) scale(-1,1) in viewBox space
   {
     const s = makeEmptySVG();
     const wrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -260,7 +255,6 @@ function makeVariantsForRow(row) {
     mirrorCell.querySelector('.frame').appendChild(s);
   }
 
-  // 2) Rotate 180° about center (cx, cy)
   {
     const s = makeEmptySVG();
     const wrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -270,18 +264,15 @@ function makeVariantsForRow(row) {
     rotCell.querySelector('.frame').appendChild(s);
   }
 
-  // 3) Vertical squeeze 50% about center
   {
     const s = makeEmptySVG();
     const wrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    // translate to center, scale Y by 0.5, translate back
     wrap.setAttribute('transform', `translate(0, ${cy}) scale(1, 0.5) translate(0, ${-cy})`);
     wrap.appendChild(cloneContentGroup());
     s.appendChild(wrap);
     squishCell.querySelector('.frame').appendChild(s);
   }
 
-  // 4) Grayscale via filter on a wrapping group
   {
     const s = makeEmptySVG();
     const wrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
